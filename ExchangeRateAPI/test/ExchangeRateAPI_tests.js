@@ -32,7 +32,7 @@ describe("tobtc API", function() {
     describe("Currencies", function() {
         it("Verify if all available currencies are present", function () {
             return chakram.get(TICKER_URL)
-                .then((allRates) => {
+                .then(function(allRates) {
                     expect(Object.keys(allRates.body).sort()).to.eql(allCurrencies.sort());
                 })
         });
