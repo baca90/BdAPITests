@@ -2,9 +2,10 @@ var chakram = require('chakram');
 var expect = chakram.expect;
 var assert = require('chai').assert;
 
-const defaultCurrency = "AUD";
 const TICKER_URL = "https://blockchain.info/ticker";
-const TOTBC_URL = "https://blockchain.info/tobtc";
+const TOBTC_URL = "https://blockchain.info/tobtc";
+const SYMBOL_ERROR = "Parameter <currency> with unsupported symbol";
+const NUMERICAL_ERROR = "Parameter <value> with invalid numerical value";
 const  allCurrencies = ["USD", "JPY", "CNY", "SGD","HKD", "CAD", "NZD",
                         "AUD", "CLP", "GBP", "DKK","SEK", "ISK", "BRL",
                         "EUR", "RUB", "PLN", "THB", "KRW", "TWD", "CHF", "INR"]
@@ -30,8 +31,7 @@ describe("tobtc API", function() {
 
     describe("Currencies", function() {
         it("Verify if all available currencies are present", function () {
-            return chakram
-                .get(TICKER_URL)
+            return chakram.get(TICKER_URL)
                 .then((allRates) => {
                     expect(Object.keys(allRates.body).sort()).to.eql(allCurrencies.sort());
                 })
@@ -39,45 +39,46 @@ describe("tobtc API", function() {
     });
 
     describe("Converting", function() {
-        
-        it("Verify AUD converting", function () {
-            var amount = 20000;
-            return Promise.all([
-                chakram.get(`${TOTBC_URL}?currency=${curr}&value=${amount}`),
-                chakram.get(TICKER_URL)
-            ]).then (([convertedValue, allRates]) => {
-                actResult = parseFloat(convertedValue.body);
-                expResult = parseFloat(amount / allRates.body[curr].sell);
 
-                assert.closeTo(actResult, expResult, 0.01, "Received and calculated values mismatch");
-            })
+        it("Verify all currency converting", function () {
+            var amount = 20000;
+            var allRates = chakram.get(TICKER_URL);
+            
+            allCurrencies.forEach(function (curr){
+                chakram.get(`${TOBTC_URL}?currency=${curr}&value=${amount}`)
+                .then(function (result){
+                    actResult = parseFloat(result.body);
+                    expResult = parseFloat(amount / allRates.body[curr].sell);
+                    assert.closeTo(actResult, expResult, 0.01, "Received and calculated values mismatch");
+                })
+            });
         });
 
         it("Verify error message for unsupported currency parameter", function () {
             var response = chakram.get("https://blockchain.info/tobtc?currency=XXX&value=1")
-            return expect(response).to.be.tobtc.error(500, "Parameter <currency> with unsupported symbol");
+            return expect(response).to.be.tobtc.error(500, SYMBOL_ERROR);
         });
 
         it("Verify error message for unsupported amount parameter", function () {
             var response = chakram.get("https://blockchain.info/tobtc?currency=AUD&value=X")
-            return expect(response).to.be.tobtc.error(500, "Parameter <value> with invalid numerical value");
+            return expect(response).to.be.tobtc.error(500, NUMERICAL_ERROR);
         });
 
         it("Verify error message for both unsupported parameters", function () {
             var response = chakram.get("https://blockchain.info/tobtc?currency=X&value=X")
-            return expect(response).to.be.tobtc.error(500, "Parameter <currency> with unsupported symbol");
+            return expect(response).to.be.tobtc.error(500, SYMBOL_ERROR);
         });
 
         it("Verify error message for out of range amount parameter", function () {
             var amount = 99999999999999999999999999999999999999999999999999;
             var response = chakram.get(`https://blockchain.info/tobtc?currency=AUD&value=${amount}`)
-            return expect(response).to.be.tobtc.error(500, "Parameter <value> with invalid numerical value");
+            return expect(response).to.be.tobtc.error(500, NUMERICAL_ERROR);
         });
 
         it("Verify error message for almost out of range amount parameter", function () {
             var amount = 9999999999999999999999999999999999999999999999999;
             var response = chakram.get(`https://blockchain.info/tobtc?currency=AUD&value=${amount}`)
-            return expect(response).not.to.be.tobtc.error(500, "Parameter <value> with invalid numerical value");
+            return expect(response).not.to.be.tobtc.error(500, NUMERICAL_ERROR);
         });
     });
 })
