@@ -2,11 +2,13 @@ var chakram = require('chakram'),
     expect = chakram.expect,
     XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest,
     assert = require('chai').assert,
-    allRatesUrl = "https://blockchain.info/ticker",
     defaultCurrency = "AUD",
+    allRatesUrl = "https://blockchain.info/ticker",
     allCurrencies = ["USD", "JPY", "CNY", "SGD","HKD", "CAD", "NZD"
-                    ,"AUD", "CLP", "GBP", "DKK","SEK", "ISK", "BRL"
-                    , "EUR", "RUB", "PLN", "THB", "KRW", "TWD"];
+    ,"AUD", "CLP", "GBP", "DKK","SEK", "ISK", "BRL"
+    , "EUR", "RUB", "PLN", "THB", "KRW", "TWD"],
+    wrongCurrencyError = "Parameter <currency> with unsupported symbol",
+    wrongNumericValueError = "Parameter <value> with invalid numerical value";
 
 function getResponse(url){
     var xmlHttpRequest = new XMLHttpRequest();
@@ -58,14 +60,12 @@ describe("Converting", function() {
 
     it("Verify error message for unsupported currency parameter", function () {
         var receivedResult = getConvertToBtcValue("XXX", 1);
-        var expectedResult = "Parameter <currency> with unsupported symbol";
-        return assert.equal(receivedResult, expectedResult, "Received error message mismatch");
+        return assert.equal(receivedResult, wrongCurrencyError, "Received error message mismatch");
     });
 
     it("Verify error message for unsupported amount parameter", function () {
         var receivedResult = getConvertToBtcValue(defaultCurrency, "X");
-        var expectedResult = "Parameter <value> with invalid numerical value";
-        return assert.equal(receivedResult, expectedResult, "Received error message mismatch");
+        return assert.equal(receivedResult, wrongNumericValueError, "Received error message mismatch");
     }); 
 });
 
