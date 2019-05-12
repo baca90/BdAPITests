@@ -69,16 +69,26 @@ describe("tobtc API", function() {
             return expect(response).to.be.tobtc.error(500, SYMBOL_ERROR);
         });
 
-        it("Verify error message for out of range amount parameter", function () {
-            var amount = 99999999999999999999999999999999999999999999999999;
-            var response = chakram.get(`https://blockchain.info/tobtc?currency=AUD&value=${amount}`)
+        it("Verify error message for out of range value parameter", function () {
+            var amount = "99999999999999999999999999999999999999999999999999";
+            var response = chakram.get(`https://blockchain.info/tobtc?currency=AUD&value=${amount}`);
+            expect(amount.length).to.be.equal(50);
             return expect(response).to.be.tobtc.error(500, NUMERICAL_ERROR);
         });
 
-        it("Verify error message for almost out of range amount parameter", function () {
-            var amount = 9999999999999999999999999999999999999999999999999;
-            var response = chakram.get(`https://blockchain.info/tobtc?currency=AUD&value=${amount}`)
-            return expect(response).not.to.be.tobtc.error(500, NUMERICAL_ERROR);
+        it("Verify result for almost out of range value parameter", function () {
+            var amount = "9999999999999999999999999999999999999999999999999";
+            var response = chakram.get(`https://blockchain.info/tobtc?currency=AUD&value=${amount}`);
+            var actResult = parseFloat(response.body);
+
+            chakram.get(TICKER_URL)
+            .then(function(result){
+                 var expResult = parseFloat(amount / result.body["AUD"].sell);
+                 assert.closeTo(actResult, expResult, 0.01, "Received and calculated values mismatch");
+            });
+
+            expect(amount.length).to.be.equal(49);
+            return expect(response).to.have.status(200);
         });
     });
 })
