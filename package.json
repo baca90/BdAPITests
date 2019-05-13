@@ -13,7 +13,8 @@
   "license": "ISC",
   "devDependencies": {
     "chakram": "^1.5.0",
-    "mocha": "^6.1.4"
+    "mocha": "^6.1.4",
+    "mocha-param": "^2.0.0"
   },
   "dependencies": {
     "chai": "^4.2.0"
