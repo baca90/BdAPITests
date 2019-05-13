@@ -1,17 +1,17 @@
 var chakram = require('chakram');
 var itParam = require('mocha-param');
-var expect = chakram.expect;
 var assert = require('chai').assert;
+var expect = chakram.expect;
 
-const DEF_CURRENCY = "USD";
 const DEF_AMOUNT = 20000;
+const ADDITIONAL_VALUES = [-3000, 5326.4582];
+const DEF_CURRENCY = "USD";
 const TICKER_URL = "https://blockchain.info/ticker";
 const TOBTC_URL = "https://blockchain.info/tobtc";
 const SYMBOL_ERROR = "Parameter <currency> with unsupported symbol";
 const NUMERICAL_ERROR = "Parameter <value> with invalid numerical value";
 const NO_VALUE_ERROR = "Parameter <value> is missing";
 const NO_CURRENCY_ERROR = "Parameter <currency> is missing";
-const ADDITIONAL_VALUES = [-3000, 5326.4582];
 const ALL_CURRENCIES = ["USD", "JPY", "CNY", "SGD","HKD", "CAD", "NZD",
                        "AUD", "CLP", "GBP", "DKK","SEK", "ISK", "BRL",
                        "EUR", "RUB", "PLN", "THB", "KRW", "TWD", "CHF", "INR"];
